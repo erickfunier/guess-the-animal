@@ -209,6 +209,7 @@ public class Main {
                     return playGame(node, node.right, aff_responses, neg_responses, confirmations, random, scanner);
                 }
 
+
             } else {
                 System.out.println("Is it " + ((Animal) node.value).getNameWithPrefix() + "?\n");
                 String response = scanner.nextLine().toLowerCase().replaceAll("\\p{P}$", "").replaceAll("^\\s+", "").replaceAll("\\s+$", "");
