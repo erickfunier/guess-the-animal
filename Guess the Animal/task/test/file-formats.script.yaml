@@ -1,0 +1,105 @@
+#
+# This is a script to test file formats: JSON, YAML, XML.
+#
+---
+- [start, "-type {0}"]
+- [matches, "(?si).*animal.*", The program should asks the user for a favourite animal]
+- [input, cat]
+- - contains
+  - You think of an animal, and I guess it.
+  - The program should asks the user to think of an animal
+- [input, ""] # Press Enter to start the game
+#
+# The first game started
+#
+- - contains
+  - Is it a cat?
+  - The program should asks the user is it the cat
+- [input, no]
+- - contains
+  - I give up. What animal do you have in mind?
+  - The program should give up
+- [input, dog]
+- - contains
+  - Specify a fact that distinguishes a cat from a dog
+  - The program should find out how one animal differs from another.
+- [input, It can climbs tree]
+- - contains
+  - Is the statement correct for a dog?
+  - The program should clarify if the statement is correct for a dog.
+- [input, No]
+- - matches
+  - (?si).*(again|repeat|one more game).*
+  - The program should ask to play again
+- [input, Yes]
+- - contains
+  - You think of an animal, and I guess it.
+  - The program should asks the user to think of an animal
+- [input, ""] # Press Enter to start the game
+#
+# The second game started
+#
+- - contains
+  - Can it climbs tree?
+  - The only question in the knowledge tree should be "Can it climbs tree?"
+- [input, Yes]
+- - contains
+  - Is it a cat?
+  - The program doesn't print the expected message
+- [input, No]
+- - contains
+  - I give up. What animal do you have in mind?
+  - The program should give up
+- - input
+  - a lynx
+- - input
+  - It is living in the forest
+- - contains
+  - Is the statement correct for a lynx?
+  - The program doesn't print the expected message
+- [input, Yes]
+- [input, No]
+- [finish, The program should finish when the user refuse the new game]
+- - file exists
+  - "animals.{0}"
+  - When the program started with option "java -type {0}" the data should be saved to "animals.{0}"
+
+#
+# Start the program again and load the Knowledge Tree
+#
+
+- [start, "-type {0}"]
+- - not contains
+  - Which animal do you like most?
+  - If knowledge base is exist the program should not asks the user for a favourite animal
+- - contains
+  - You think of an animal, and I guess it.
+  - The program should asks the user to think of an animal
+- [input, ""]
+#
+# The third game started. Test for the Knowledge Tree.
+#
+- - contains
+  - Can it climbs tree?
+  - The root question in knowledge tree should be "Can it climbs tree?"
+- [input, yes]
+- - contains
+  - Is it living in the forest?
+  - The second question should be 'Is it living in the forest?'
+- [input, sure]
+- - contains
+  - Is it a lynx?
+  - The last question should be 'Is it a lynx?'
+- [input, right]
+- - matches
+  - (?si).*(again|repeat|one more game).*
+  - The program should ask to play again
+- [input, No]
+- [finish, The program should finish when the user refuse the new game]
+#
+# Clear workspace after the test
+#
+- - file delete
+  - "animals.{0}"
+  - "The test can't delete animals.{0} file."
+
