@@ -1,27 +1,35 @@
 package animals;
 
+
+
 public class BinaryTree {
 
     Node root;
 
-    private Node addRecursive(Node current, Object value, String relation) {
+    BinaryTree(Node root) {
+        this.root = root;
+    }
+
+    private Node addRecursive(Node current, String data, String relation) {
         if (current == null) {
-            return new Node(value);
+            return new Node(data);
         }
 
         if (relation.equals("NO")) {
             //current.left = addRecursive(current.left, value, relation);
-            current.left = new Node(value);
+            current.setNo(new Node(data));
         } else if (relation.equals("YES")) {
             //current.right = addRecursive(current.right, value, relation);
-            current.right = new Node(value);
+            current.setYes(new Node(data));
         }
         return current;
     }
 
-    public void add(Object value, String relation) {
-        root = addRecursive(root, value, relation);
+    public void add(String data, String relation) {
+        root = addRecursive(root, data, relation);
     }
+
+
 
     private boolean containsNodeRecursive(Node current, int value) {
         if (current == null) {
@@ -40,35 +48,63 @@ public class BinaryTree {
         return containsNodeRecursive(root, value);
     }
 
-    public Node addPreOrder(Node root, Node node, Object value, String relation) {
+    public Node addPreOrder(Node root, Node node, String value, String relation) {
         Node toRetun = null;
         if (root != null) {
-            if (root.value == node.value) {
+            if (root.getData() == node.getData()) {
                 if (relation.equals("")) {
-                    root.value = value;
+                    root.setData(value);
                 } else if (relation.equals("NO")) {
-                    root.left = new Node(value);
+                    root.setNo(new Node(value));
                 } else {
-                    root.right = new Node(value);
+                    root.setYes(new Node(value));
                 }
                 return root;
 
             } else {
-                toRetun = addPreOrder(root.left, node, value, relation);
+                toRetun = addPreOrder(root.getNo(), node, value, relation);
                 if (toRetun != null) {
                     return toRetun;
                 }
-                toRetun = addPreOrder(root.right, node, value, relation);
+                toRetun = addPreOrder(root.getYes(), node, value, relation);
             }
         }
         return toRetun;
     }
 
+    private String removePrefix(String animal) {
+        return animal.replace("a ", "").replace("an ", "");
+    }
+
+    private static String removeFactPrefix(String fact) {
+        return fact.toLowerCase().replace("it ", "");
+    }
+
+    public static String getFactWithPrefix(String fact, String relation) {
+        String[] pos = {"can", "has", "is"};
+        String[] neg = {"can't", "doesn't have", "isn't"};
+
+        if (relation.equals("pos")) {
+            for (String po : pos) {
+                if (fact.toLowerCase().contains(po)) {
+                    return removeFactPrefix(fact);
+                }
+            }
+        } else {
+            for (int i = 0; i < pos.length; i++) {
+                if (fact.toLowerCase().contains(pos[i])) {
+                    return neg[i] + removeFactPrefix(fact.toLowerCase().replace(pos[i], ""));
+                }
+            }
+        }
+        return fact;
+    }
+
     public void traversePreOrder(Node node) {
         if (node != null) {
-            if (((String[])node.value)[1].toLowerCase().startsWith("it")) {
-                System.out.println("- The " + ((Animal)node.right.value).getNameWithoutPrefix() + " " + Main.getPrefix(((Animal) node.right.value).getFacts().get(0)) + ".");
-                System.out.println("- The " + ((Animal)node.left.value).getNameWithoutPrefix() + " " + Main.getPrefix(((Animal) node.left.value).getFacts().get(0)) + ".");
+            if (node.getData().toLowerCase().startsWith("it")) {
+                System.out.println("- The " + removePrefix(node.getYes().getData()) + " " + getFactWithPrefix(node.getData(), "pos") + ".");
+                System.out.println("- The " + removePrefix(node.getNo().getData()) + " " + getFactWithPrefix(node.getData(), "neg") + ".");
             }
         }
     }
@@ -78,7 +114,7 @@ public class BinaryTree {
             return null;
         }
 
-        if (value == current.value) {
+        if (value == current.getData()) {
             // Node to delete found
             // ... code to delete the node will go here
         }
@@ -86,7 +122,7 @@ public class BinaryTree {
             current.left = deleteRecursive(current.left, value);
             return current;
         }*/
-        current.right = deleteRecursive(current.right, value);
+        current.setYes(deleteRecursive(current.getYes(), value));
         return current;
     }
 
@@ -96,7 +132,7 @@ public class BinaryTree {
 
     public void getQuestion(Node root) {
         if (root != null) {
-            System.out.println(root.value);
+            System.out.println(root.getData());
         }
     }
 }

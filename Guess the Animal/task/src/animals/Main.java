@@ -1,5 +1,11 @@
 package animals;
 
+import com.fasterxml.jackson.core.JsonParseException;
+import com.fasterxml.jackson.databind.JsonMappingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.json.JsonMapper;
+
+import java.io.*;
 import java.time.LocalTime;
 import java.util.Arrays;
 import java.util.List;
@@ -26,11 +32,41 @@ public class Main {
             // evening
             System.out.println(evening_greetings[random.nextInt(evening_greetings.length)] + "\n");
         }
-        System.out.println("I want to learn about animals.\nWhich animal do you like most?");
     }
 
+    private static BinaryTree loadKnowledgeTree(String filename) {
+        ObjectMapper objectMapper = new JsonMapper();
+        try (Reader reader = new FileReader(filename)) {
+            Node root = objectMapper.readValue(reader, Node.class);
+            return new BinaryTree(root);
+        } catch (JsonMappingException | JsonParseException e) {
+            throw new RuntimeException(e);
+        } catch (IOException e) {
+            return new BinaryTree(null);
+        }
+    }
 
-    public static void main(String[] args) {
+    private static String startGame(BinaryTree knowledgeTree, Scanner scanner) {
+        if (knowledgeTree.root != null) {
+            System.out.println("I know a lot about animals.");
+            System.out.println("Let's play a game!\nYou think of an animal, and I guess it.\nPress enter when you're ready.");
+            scanner.nextLine();
+            return null;
+        } else {
+            System.out.println("I want to learn about animals.\nWhich animal do you like most?");
+            String animal = identifyTheAnimal(scanner);
+
+            System.out.println("Wonderful! I've learned so much about animals!\nLet's play a game!\nYou think of an animal, and I guess it.\nPress enter when you're ready.");
+            scanner.nextLine();
+            return animal;
+        }
+    }
+
+    private static boolean checkIfAnimalNode(Node node) {
+        return node.getData().startsWith("a");
+    }
+
+    public static void main(String[] args) throws IOException {
         List<String> aff_responses = List.of("y", "yes", "yeah", "yep", "sure", "right", "affirmative", "correct", "indeed", "you bet", "exactly", "you said it");
         List<String> neg_responses = List.of("n", "no", "no way", "nah", "nope", "negative", "i don't think so, yeah no", "i don't think so", "yeah no");
         List<String> confirmations = List.of(
@@ -41,44 +77,39 @@ public class Main {
                 "Oh, no, don't try to confuse me: say yes or no.");
         Random random = new Random();
         Scanner scanner = new Scanner(System.in);
+        String fileName = "animals.json";
 
         printHelloGreetings();
-
-        Animal animal = new Animal(identifyTheAnimal(scanner));
-        BinaryTree firstTree = new BinaryTree();
-        firstTree.add(animal.getNameWithPrefix(), "");
+        BinaryTree knowledgeTree = loadKnowledgeTree(fileName);
+        String animal = startGame(knowledgeTree, scanner);
 
         boolean playing = true;
-        BinaryTree secondTree = new BinaryTree();
+
         while (playing) {
-            System.out.println("Wonderful! I've learned so much about animals!\nLet's play a game!\nYou think of an animal, and I guess it.\nPress enter when you're ready.");
-            scanner.nextLine();
+            if (animal == null) {
 
-            if (secondTree.root != null) {
-                Node node = playGame(null, secondTree.root, aff_responses, neg_responses, confirmations, random, scanner);
-
-                if (!(node.value instanceof String[])) {
-                    Animal secondAnimal = new Animal(identifyTheAnimal(scanner));
-
+                Node node = playGame(null, knowledgeTree.root, aff_responses, neg_responses, confirmations, random, scanner);
+                if (checkIfAnimalNode(node)) {
                     System.out.println("I give up. What animal do you have in mind?");
+                    String secondAnimal = identifyTheAnimal(scanner);
 
-                    animal = ((Animal)node.value);
-                    System.out.println("Specify a fact that distinguishes " + ((Animal)node.value).getNameWithPrefix() + " from " + secondAnimal.getNameWithPrefix() + ".\n" +
+                    animal = node.getData();
+                    System.out.println("Specify a fact that distinguishes " + node.getData() + " from " + secondAnimal + ".\n" +
                             "The sentence should satisfy one of the following templates:\n- It can ...\n- It has ...\n- It is a/an ...'\n");
 
-                    String fact = scanner.nextLine();
+                    String fact = scanner.nextLine().replaceAll("\\p{P}$", "");
 
                     if (!fact.toLowerCase().startsWith("it can") && !fact.toLowerCase().startsWith("it is") && !fact.toLowerCase().startsWith("it has")) {
                         System.out.println("The examples of a statement:\n" +
                                 "- It can fly\n"+
                                 "- It has horn\n"+
                                 "- It is a mammal\n"+
-                                "Specify a fact that distinguishes " + ((Animal)node.value).getNameWithPrefix() + " from " + secondAnimal.getNameWithPrefix() + ".\n" +
+                                "Specify a fact that distinguishes " + node.getData() + " from " + secondAnimal + ".\n" +
                                 "The sentence should be of the format: 'It can/has/is ...'.");
                         fact = scanner.nextLine().replaceAll("\\p{P}$", "");
                     }
 
-                    System.out.println("Is the statement correct for " + secondAnimal.getNameWithPrefix() + "?");
+                    System.out.println("Is the statement correct for " + secondAnimal + "?");
 
                     String response = scanner.nextLine().toLowerCase().replaceAll("\\p{P}$", "").replaceAll("^\\s+", "").replaceAll("\\s+$", "");
                     String factWithoutPrefix = Arrays.stream(fact.split(" ")).skip(2).collect(Collectors.joining(" "));
@@ -87,31 +118,26 @@ public class Main {
 
                         response = scanner.nextLine().toLowerCase().replaceAll("\\p{P}$", "").replaceAll("^\\s+", "").replaceAll("\\s+$", "");
                     }
-                    node = secondTree.addPreOrder(secondTree.root, node, new String[]{factWithoutPrefix, fact}, "");
+                    node = knowledgeTree.addPreOrder(knowledgeTree.root, node, fact, "");
 
                     if (aff_responses.contains(response)) {
-                        animal.addFact(new String[]{factWithoutPrefix, fact.split(" ")[1], "no"});
-                        secondAnimal.addFact(new String[]{factWithoutPrefix, fact.split(" ")[1], "yes"});
-                        secondTree.addPreOrder(secondTree.root, node, animal, "NO");
-                        secondTree.addPreOrder(secondTree.root, node, secondAnimal, "YES");
+                        knowledgeTree.addPreOrder(knowledgeTree.root, node, animal, "NO");
+                        knowledgeTree.addPreOrder(knowledgeTree.root, node, secondAnimal, "YES");
                     } else {
-                        animal.addFact(new String[]{factWithoutPrefix, fact.split(" ")[1], "yes"});
-                        secondAnimal.addFact(new String[]{factWithoutPrefix, fact.split(" ")[1], "no"});
-                        secondTree.addPreOrder(secondTree.root, node, animal, "YES");
-                        secondTree.addPreOrder(secondTree.root, node, secondAnimal, "NO");
+                        knowledgeTree.addPreOrder(knowledgeTree.root, node, animal, "YES");
+                        knowledgeTree.addPreOrder(knowledgeTree.root, node, secondAnimal, "NO");
                     }
 
                     System.out.println("I have learned the following facts about animals:");
-                    secondTree.traversePreOrder(node);
+                    knowledgeTree.traversePreOrder(node);
 
                     System.out.println("I can distinguish these animals by asking the question:");
-                    System.out.println(getQuestion((String[])node.value) + "?\n");
+                    System.out.println(getQuestion(node.getData()) + "?\n");
 
-                    System.out.println("Nice! I've learned so much about animals!\n");
+                    System.out.println("I've learned so much about animals!\n");
                 }
             } else {
-
-                System.out.println("Is it " + animal.getNameWithPrefix() + "?");
+                System.out.println("Is it " + animal + "?");
 
                 String response = scanner.nextLine().toLowerCase().replaceAll("\\p{P}$", "").replaceAll("^\\s+", "").replaceAll("\\s+$", "");
                 while (!aff_responses.contains(response) && !neg_responses.contains(response)) {
@@ -120,59 +146,54 @@ public class Main {
                     response = scanner.nextLine().toLowerCase().replaceAll("\\p{P}$", "").replaceAll("^\\s+", "").replaceAll("\\s+$", "");
                 }
 
-                Animal secondAnimal = null;
+                String secondAnimal = null;
                 if (neg_responses.contains(response)) {
                     System.out.println("I give up. What animal do you have in mind?");
 
-                    secondAnimal = new Animal(identifyTheAnimal(scanner));
+                    secondAnimal = identifyTheAnimal(scanner);
 
-                    System.out.println("Specify a fact that distinguishes " + animal.getNameWithPrefix() + " from " + secondAnimal.getNameWithPrefix() + ".\n" +
+                    System.out.println("Specify a fact that distinguishes " + animal + " from " + secondAnimal + ".\n" +
                             "The sentence should satisfy one of the following templates:\n- It can ...\n- It has ...\n- It is a/an ...'\n");
                 }
 
-                String fact = scanner.nextLine();
+                String fact = scanner.nextLine().replaceAll("\\p{P}$", "");
 
                 if (!fact.toLowerCase().startsWith("it can") && !fact.toLowerCase().startsWith("it is") && !fact.toLowerCase().startsWith("it has")) {
                     System.out.println("The examples of a statement:\n" +
                             "- It can fly\n"+
                             "- It has horn\n"+
                             "- It is a mammal\n"+
-                            "Specify a fact that distinguishes " + animal.getNameWithPrefix() + " from " + secondAnimal.getNameWithPrefix() + ".\n" +
+                            "Specify a fact that distinguishes " + animal + " from " + secondAnimal + ".\n" +
                             "The sentence should be of the format: 'It can/has/is ...'.");
                     fact = scanner.nextLine().replaceAll("\\p{P}$", "");
                 }
 
                 assert secondAnimal != null;
-                System.out.println("Is the statement correct for " + secondAnimal.getNameWithPrefix() + "?");
+                System.out.println("Is the statement correct for " + secondAnimal + "?");
 
                 response = scanner.nextLine().toLowerCase().replaceAll("\\p{P}$", "").replaceAll("^\\s+", "").replaceAll("\\s+$", "");
-                String factWithoutPrefix = Arrays.stream(fact.split(" ")).skip(2).collect(Collectors.joining(" "));
                 while (!aff_responses.contains(response) && !neg_responses.contains(response)) {
                     System.out.println(confirmations.get(random.nextInt(confirmations.size())));
 
                     response = scanner.nextLine().toLowerCase().replaceAll("\\p{P}$", "").replaceAll("^\\s+", "").replaceAll("\\s+$", "");
                 }
-                secondTree.add(new String[]{factWithoutPrefix, fact}, "");
+                knowledgeTree.add(fact, "");
 
                 if (aff_responses.contains(response)) {
-                    animal.addFact(new String[]{factWithoutPrefix, fact.split(" ")[1], "no"});
-                    secondAnimal.addFact(new String[]{factWithoutPrefix, fact.split(" ")[1], "yes"});
-                    secondTree.add(animal, "NO");
-                    secondTree.add(secondAnimal, "YES");
+                    knowledgeTree.add(animal, "NO");
+                    knowledgeTree.add(secondAnimal, "YES");
                 } else {
-                    animal.addFact(new String[]{factWithoutPrefix, fact.split(" ")[1], "yes"});
-                    secondAnimal.addFact(new String[]{factWithoutPrefix, fact.split(" ")[1], "no"});
-                    secondTree.add(animal, "YES");
-                    secondTree.add(secondAnimal, "NO");
+                    knowledgeTree.add(animal, "YES");
+                    knowledgeTree.add(secondAnimal, "NO");
                 }
 
                 System.out.println("I have learned the following facts about animals:");
-                secondTree.traversePreOrder(secondTree.root);
+                knowledgeTree.traversePreOrder(knowledgeTree.root);
 
                 System.out.println("I can distinguish these animals by asking the question:");
-                System.out.println(getQuestion((String[])secondTree.root.value) + "?\n");
+                System.out.println(getQuestion(knowledgeTree.root.getData()) + "?\n");
 
-                System.out.println("Nice! I've learned so much about animals!\n");
+                System.out.println("I've learned so much about animals!\n");
             }
 
             System.out.println("Would you like to play again?");
@@ -186,6 +207,14 @@ public class Main {
 
             if (neg_responses.contains(response)) {
                 playing = false;
+                ObjectMapper objectMapper = new JsonMapper();
+                objectMapper
+                        .writerWithDefaultPrettyPrinter()
+                        .writeValue(new File(fileName), knowledgeTree.root);
+            } else {
+                animal = null;
+                System.out.println("Wonderful!\nLet's play a game!\nYou think of an animal, and I guess it.\nPress enter when you're ready.");
+                scanner.nextLine();
             }
         }
 
@@ -194,8 +223,8 @@ public class Main {
 
     private static Node playGame(Node parentNode, Node node, List<String> aff_responses, List<String> neg_responses, List<String> confirmations, Random random, Scanner scanner) {
         if (node != null) {
-            if (node.value instanceof String[] && ((String[])node.value)[1].toLowerCase().startsWith("it")) {
-                System.out.println(getQuestion((String[])node.value) + "?\n");
+            if (node.getData().toLowerCase().startsWith("it")) {
+                System.out.println(getQuestion(node.getData()) + "?");
                 String response = scanner.nextLine().toLowerCase().replaceAll("\\p{P}$", "").replaceAll("^\\s+", "").replaceAll("\\s+$", "");
                 while (!aff_responses.contains(response) && !neg_responses.contains(response)) {
                     System.out.println(confirmations.get(random.nextInt(confirmations.size())));
@@ -204,14 +233,14 @@ public class Main {
                 }
 
                 if (neg_responses.contains(response)) {
-                    return playGame(node, node.left, aff_responses, neg_responses, confirmations, random, scanner);
+                    return playGame(node, node.getNo(), aff_responses, neg_responses, confirmations, random, scanner);
                 } else {
-                    return playGame(node, node.right, aff_responses, neg_responses, confirmations, random, scanner);
+                    return playGame(node, node.getYes(), aff_responses, neg_responses, confirmations, random, scanner);
                 }
 
 
             } else {
-                System.out.println("Is it " + ((Animal) node.value).getNameWithPrefix() + "?\n");
+                System.out.println("Is it " + node.getData() + "?");
                 String response = scanner.nextLine().toLowerCase().replaceAll("\\p{P}$", "").replaceAll("^\\s+", "").replaceAll("\\s+$", "");
                 while (!aff_responses.contains(response) && !neg_responses.contains(response)) {
                     System.out.println(confirmations.get(random.nextInt(confirmations.size())));
@@ -219,11 +248,7 @@ public class Main {
                     response = scanner.nextLine().toLowerCase().replaceAll("\\p{P}$", "").replaceAll("^\\s+", "").replaceAll("\\s+$", "");
                 }
 
-                if (aff_responses.contains(response)) {
-                    return new Node(new String[]{"found"});
-                } else {
-                    return node;
-                }
+                return node;
             }
 
         } else {
@@ -231,47 +256,32 @@ public class Main {
         }
     }
 
-    public static String getPrefix(String[] fact) {
-        String[] pos = {"can", "has", "is"};
+
+
+    public static String getQuestion(String fact) {
         String[] neg = {"can't", "doesn't have", "isn't"};
-
-        if (fact[2].equals("no")) {
-            for (int i = 0; i < pos.length; i++) {
-                fact[1] = fact[1].replace(pos[i], neg[i]);
-            }
-        } else {
-            for (int i = 0; i < pos.length; i++) {
-                fact[1] = fact[1].replace(neg[i], pos[i]);
-            }
-        }
-
-        return fact[1] + " " + fact[0];
-    }
-
-    public static String getQuestion(String[] fact) {
-        String[] neg = {"can't", "doesn't have", "isn't"};
-        String[] pos = {"can", "has", "is"};
-        String[] quest = {"Can it ", "Does it have ", "Is it "};
+        String[] pos = {"it can", "it has", "it is"};
+        String[] quest = {"Can it", "Does it have", "Is it"};
 
 
         for (int i = 0; i < pos.length; i++) {
-            if (fact[1].contains(pos[i])) {
-                return quest[i] + fact[0];
+            if (fact.toLowerCase().contains(pos[i])) {
+                return quest[i] + fact.toLowerCase().replace(pos[i], "");
             }
         }
 
         for (int i = 0; i < neg.length; i++) {
-            if (fact[1].contains(neg[i])) {
-                return quest[i] + fact[0];
+            if (fact.toLowerCase().contains(neg[i])) {
+                return quest[i] + fact.toLowerCase().replace(neg[i], "");
             }
         }
         return "";
     }
 
-    private static String[] identifyTheAnimal(Scanner scanner) {
+    private static String identifyTheAnimal(Scanner scanner) {
         String animal = scanner.nextLine().toLowerCase();
 
-        return getAnimalWithAndWithoutPrefix(animal);
+        return getAnimalWithAndWithoutPrefix(animal)[0];
     }
 
     private static String[] getAnimalWithAndWithoutPrefix(String animal) {
@@ -312,8 +322,6 @@ public class Main {
         }
         return new String[]{animalWithPrefix, animalWithoutPrefix};
     }
-
-
 }
 
 

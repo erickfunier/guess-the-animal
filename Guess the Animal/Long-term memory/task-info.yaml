@@ -671,6 +671,41 @@ files:
         }
     }
   learner_created: true
+- name: animals.json
+  visible: true
+  learner_created: true
 feedback_link: https://hyperskill.org/learn/step/11082#comment
-status: Unchecked
+status: Failed
+feedback:
+  message: "Wrong answer in test #5\n\nThe program should ask to play again\nExpected\
+    \ matches: &quot;(?si).*(again|repeat|one more game).*&quot;\nActual data is:\
+    \ &quot;I give up. What animal do you have in mind?&quot;.\n\nPlease find below\
+    \ the output of your program during this failed test.\nNote that the &#39;&gt;&#39;\
+    \ character indicates the beginning of the input line.\n\n---\n\nArguments for\
+    \ Main: -type json\nArguments for Main: -type json\n\nGood evening!\n\nI want\
+    \ to learn about animals.\nWhich animal do you like most?\n&gt; cat\nWonderful!\
+    \ I&#39;ve learned so much about animals!\nLet&#39;s play a game!\nYou think of\
+    \ an animal, and I guess it.\nPress enter when you&#39;re ready.\n&gt; \nIs it\
+    \ a cat?\n&gt; no\nI give up. What animal do you have in mind?\n&gt; dog\nSpecify\
+    \ a fact that distinguishes a cat from a dog.\nThe sentence should satisfy one\
+    \ of the following templates:\n- It can ...\n- It has ...\n- It is a/an ...&#39;\n\
+    \n&gt; It can climbs tree\nIs the statement correct for a dog?\n&gt; No\nI have\
+    \ learned the following facts about animals:\n- The cat can climbs tree.\n- The\
+    \ dog can&#39;t climbs tree.\nI can distinguish these animals by asking the question:\n\
+    Can it climbs tree?\n\nI&#39;ve learned so much about animals!\n\nWould you like\
+    \ to play again?\n&gt; Yes\nWonderful!\nLet&#39;s play a game!\nYou think of an\
+    \ animal, and I guess it.\nPress enter when you&#39;re ready.\n&gt; \nCan it climbs\
+    \ tree?\n&gt; Yes\nIs it a cat?\n&gt; No\nI give up. What animal do you have in\
+    \ mind?\n&gt; a lynx\nSpecify a fact that distinguishes a cat from a lynx.\nThe\
+    \ sentence should satisfy one of the following templates:\n- It can ...\n- It\
+    \ has ...\n- It is a/an ...&#39;\n\n&gt; It is living in the forest\nIs the statement\
+    \ correct for a lynx?\n&gt; Yes\nI have learned the following facts about animals:\n\
+    - The lynx is living in the forest.\n- The cat isn&#39;t living in the forest.\n\
+    I can distinguish these animals by asking the question:\nIs it living in the forest?\n\
+    \nI&#39;ve learned so much about animals!\n\nWould you like to play again?\n&gt;\
+    \ No\n\nSee you soon!\nGood evening!\n\nI know a lot about animals.\nLet&#39;s\
+    \ play a game!\nYou think of an animal, and I guess it.\nPress enter when you&#39;re\
+    \ ready.\n&gt; \nCan it climbs tree?\n&gt; yes\nIs it living in the forest?\n\
+    &gt; sure\nIs it a lynx?\n&gt; right\nI give up. What animal do you have in mind?"
+  time: "Thu, 24 Nov 2022 22:59:01 UTC"
 record: -1

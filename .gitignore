@@ -1,0 +1,9 @@
+# Project exclude paths
+/.gradle/
+/Guess the Animal/task/build/
+/Guess the Animal/task/out/
+/Guess the Animal/task/out/production/classes/
+/Topics/Custom exceptions/Checked exception with constructor/out/
+/Topics/Custom exceptions/Checked exception with constructor/out/production/classes/
+/Topics/Custom exceptions/Square class/out/
+/Topics/Custom exceptions/Square class/out/production/classes/
