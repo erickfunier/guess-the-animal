@@ -1,6 +1,7 @@
 package animals;
 
 
+import java.util.Objects;
 
 public class BinaryTree {
 
@@ -51,7 +52,7 @@ public class BinaryTree {
     public Node addPreOrder(Node root, Node node, String value, String relation) {
         Node toRetun = null;
         if (root != null) {
-            if (root.getData() == node.getData()) {
+            if (Objects.equals(root.getData(), node.getData())) {
                 if (relation.equals("")) {
                     root.setData(value);
                 } else if (relation.equals("NO")) {

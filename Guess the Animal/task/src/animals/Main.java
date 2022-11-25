@@ -4,7 +4,10 @@ import com.fasterxml.jackson.core.JsonParseException;
 import com.fasterxml.jackson.databind.JsonMappingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.json.JsonMapper;
+import com.fasterxml.jackson.dataformat.xml.XmlMapper;
+import com.fasterxml.jackson.dataformat.yaml.YAMLMapper;
 
+import javax.management.modelmbean.XMLParseException;
 import java.io.*;
 import java.time.LocalTime;
 import java.util.Arrays;
@@ -34,15 +37,46 @@ public class Main {
         }
     }
 
-    private static BinaryTree loadKnowledgeTree(String filename) {
-        ObjectMapper objectMapper = new JsonMapper();
-        try (Reader reader = new FileReader(filename)) {
-            Node root = objectMapper.readValue(reader, Node.class);
-            return new BinaryTree(root);
-        } catch (JsonMappingException | JsonParseException e) {
-            throw new RuntimeException(e);
-        } catch (IOException e) {
-            return new BinaryTree(null);
+    private static BinaryTree loadKnowledgeTree(String filename, String type) {
+        if (type != null) {
+            switch (type) {
+                case "xml":
+                    ObjectMapper objectMapper = new XmlMapper();
+                    try (Reader reader = new FileReader(filename)) {
+                        Node root = objectMapper.readValue(reader, Node.class);
+                        return new BinaryTree(root);
+                    } catch (IOException e) {
+                        return new BinaryTree(null);
+                    }
+                case "yaml":
+                    objectMapper = new YAMLMapper();
+                    try (Reader reader = new FileReader(filename)) {
+                        Node root = objectMapper.readValue(reader, Node.class);
+                        return new BinaryTree(root);
+                    } catch (IOException e) {
+                        return new BinaryTree(null);
+                    }
+                default:
+                    objectMapper = new JsonMapper();
+                    try (Reader reader = new FileReader(filename)) {
+                        Node root = objectMapper.readValue(reader, Node.class);
+                        return new BinaryTree(root);
+                    } catch (JsonMappingException | JsonParseException e) {
+                        throw new RuntimeException(e);
+                    } catch (IOException e) {
+                        return new BinaryTree(null);
+                    }
+            }
+        } else {
+            ObjectMapper objectMapper = new JsonMapper();
+            try (Reader reader = new FileReader(filename)) {
+                Node root = objectMapper.readValue(reader, Node.class);
+                return new BinaryTree(root);
+            } catch (JsonMappingException | JsonParseException e) {
+                throw new RuntimeException(e);
+            } catch (IOException e) {
+                return new BinaryTree(null);
+            }
         }
     }
 
@@ -77,10 +111,20 @@ public class Main {
                 "Oh, no, don't try to confuse me: say yes or no.");
         Random random = new Random();
         Scanner scanner = new Scanner(System.in);
+        String type = null;
+        if (args.length > 0)
+            type = args[1];
+
         String fileName = "animals.json";
+        if (type != null)
+            switch (type) {
+                case "xml" -> fileName = "animals.xml";
+                case "yaml" -> fileName = "animals.yaml";
+            }
+
 
         printHelloGreetings();
-        BinaryTree knowledgeTree = loadKnowledgeTree(fileName);
+        BinaryTree knowledgeTree = loadKnowledgeTree(fileName, type);
         String animal = startGame(knowledgeTree, scanner);
 
         boolean playing = true;
@@ -88,13 +132,13 @@ public class Main {
         while (playing) {
             if (animal == null) {
 
-                Node node = playGame(null, knowledgeTree.root, aff_responses, neg_responses, confirmations, random, scanner);
-                if (checkIfAnimalNode(node)) {
+                Node[] node = playGame(null, knowledgeTree.root, aff_responses, neg_responses, confirmations, random, scanner);
+                if (node[0] != null) {
                     System.out.println("I give up. What animal do you have in mind?");
                     String secondAnimal = identifyTheAnimal(scanner);
 
-                    animal = node.getData();
-                    System.out.println("Specify a fact that distinguishes " + node.getData() + " from " + secondAnimal + ".\n" +
+                    animal = node[1].getData();
+                    System.out.println("Specify a fact that distinguishes " + node[1].getData() + " from " + secondAnimal + ".\n" +
                             "The sentence should satisfy one of the following templates:\n- It can ...\n- It has ...\n- It is a/an ...'\n");
 
                     String fact = scanner.nextLine().replaceAll("\\p{P}$", "");
@@ -104,7 +148,7 @@ public class Main {
                                 "- It can fly\n"+
                                 "- It has horn\n"+
                                 "- It is a mammal\n"+
-                                "Specify a fact that distinguishes " + node.getData() + " from " + secondAnimal + ".\n" +
+                                "Specify a fact that distinguishes " + node[1].getData() + " from " + secondAnimal + ".\n" +
                                 "The sentence should be of the format: 'It can/has/is ...'.");
                         fact = scanner.nextLine().replaceAll("\\p{P}$", "");
                     }
@@ -118,21 +162,21 @@ public class Main {
 
                         response = scanner.nextLine().toLowerCase().replaceAll("\\p{P}$", "").replaceAll("^\\s+", "").replaceAll("\\s+$", "");
                     }
-                    node = knowledgeTree.addPreOrder(knowledgeTree.root, node, fact, "");
+                    Node tempNode = knowledgeTree.addPreOrder(knowledgeTree.root, node[1], fact, "");
 
                     if (aff_responses.contains(response)) {
-                        knowledgeTree.addPreOrder(knowledgeTree.root, node, animal, "NO");
-                        knowledgeTree.addPreOrder(knowledgeTree.root, node, secondAnimal, "YES");
+                        knowledgeTree.addPreOrder(knowledgeTree.root, tempNode, animal, "NO");
+                        knowledgeTree.addPreOrder(knowledgeTree.root, tempNode, secondAnimal, "YES");
                     } else {
-                        knowledgeTree.addPreOrder(knowledgeTree.root, node, animal, "YES");
-                        knowledgeTree.addPreOrder(knowledgeTree.root, node, secondAnimal, "NO");
+                        knowledgeTree.addPreOrder(knowledgeTree.root, tempNode, animal, "YES");
+                        knowledgeTree.addPreOrder(knowledgeTree.root, tempNode, secondAnimal, "NO");
                     }
 
                     System.out.println("I have learned the following facts about animals:");
-                    knowledgeTree.traversePreOrder(node);
+                    knowledgeTree.traversePreOrder(tempNode);
 
                     System.out.println("I can distinguish these animals by asking the question:");
-                    System.out.println(getQuestion(node.getData()) + "?\n");
+                    System.out.println(getQuestion(tempNode.getData()) + "?\n");
 
                     System.out.println("I've learned so much about animals!\n");
                 }
@@ -207,7 +251,17 @@ public class Main {
 
             if (neg_responses.contains(response)) {
                 playing = false;
-                ObjectMapper objectMapper = new JsonMapper();
+                ObjectMapper objectMapper;
+                if (type != null) {
+                    switch (type) {
+                        case "xml" -> objectMapper = new XmlMapper();
+                        case "yaml" -> objectMapper = new YAMLMapper();
+                        default -> objectMapper = new JsonMapper();
+                    }
+                } else {
+                    objectMapper = new JsonMapper();
+                }
+
                 objectMapper
                         .writerWithDefaultPrettyPrinter()
                         .writeValue(new File(fileName), knowledgeTree.root);
@@ -221,7 +275,7 @@ public class Main {
         System.out.println("\n" + bye_greetings[random.nextInt(bye_greetings.length)]);
     }
 
-    private static Node playGame(Node parentNode, Node node, List<String> aff_responses, List<String> neg_responses, List<String> confirmations, Random random, Scanner scanner) {
+    private static Node[] playGame(Node parentNode, Node node, List<String> aff_responses, List<String> neg_responses, List<String> confirmations, Random random, Scanner scanner) {
         if (node != null) {
             if (node.getData().toLowerCase().startsWith("it")) {
                 System.out.println(getQuestion(node.getData()) + "?");
@@ -248,12 +302,13 @@ public class Main {
                     response = scanner.nextLine().toLowerCase().replaceAll("\\p{P}$", "").replaceAll("^\\s+", "").replaceAll("\\s+$", "");
                 }
 
-                return node;
+                if (aff_responses.contains(response)) {
+                    return new Node[] {null, node};
+                }
             }
-
-        } else {
-            return parentNode;
         }
+
+        return new Node[] {parentNode, node};
     }
 
 
