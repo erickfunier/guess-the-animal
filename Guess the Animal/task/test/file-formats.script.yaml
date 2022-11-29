@@ -3,12 +3,17 @@
 #
 ---
 - [start, "-type {0}"]
-- [matches, "(?si).*animal.*", The program should asks the user for a favourite animal]
+- [contains, "?", "The program should asks the user for a favourite animal"]
 - [input, cat]
+- - matches
+  - (?is).*1.*Play.*List.*Search.*stat.*Exit.*
+  - The program should print the menu
+- [input, "1"]
 - - contains
   - You think of an animal, and I guess it.
   - The program should asks the user to think of an animal
 - [input, ""] # Press Enter to start the game
+
 #
 # The first game started
 #
@@ -21,8 +26,8 @@
   - The program should give up
 - [input, dog]
 - - contains
-  - Specify a fact that distinguishes a cat from a dog
-  - The program should find out how one animal differs from another.
+  - Specify a fact that distinguishes
+  - The program should ask a question to distinguishes a dog from a cat
 - [input, It can climbs tree]
 - - contains
   - Is the statement correct for a dog?
@@ -36,6 +41,7 @@
   - You think of an animal, and I guess it.
   - The program should asks the user to think of an animal
 - [input, ""] # Press Enter to start the game
+
 #
 # The second game started
 #
@@ -57,49 +63,38 @@
 - - contains
   - Is the statement correct for a lynx?
   - The program doesn't print the expected message
-- [input, Yes]
-- [input, No]
-- [finish, The program should finish when the user refuse the new game]
+- [input, yes]
+- [input, no]
+- - matches
+  - (?is).*1.*Play.*List.*Search.*stat.*0.*Exit.*
+  - The program should print the menu after the user leave the game
+- - input
+  - "0"
+- - finish
+  - The program should finish when user select 0. Exit
+
 - - file exists
   - "animals.{0}"
-  - When the program started with option "java -type {0}" the data should be saved to "animals.{0}"
+  - "The program should save knowledge tree to animals.{0} file."
 
 #
 # Start the program again and load the Knowledge Tree
 #
-
-- [start, "-type {0}"]
+- - start
+  - "-type {0}"
 - - not contains
   - Which animal do you like most?
   - If knowledge base is exist the program should not asks the user for a favourite animal
 - - contains
-  - You think of an animal, and I guess it.
-  - The program should asks the user to think of an animal
-- [input, ""]
-#
-# The third game started. Test for the Knowledge Tree.
-#
-- - contains
-  - Can it climbs tree?
-  - The root question in knowledge tree should be "Can it climbs tree?"
-- [input, yes]
-- - contains
-  - Is it living in the forest?
-  - The second question should be 'Is it living in the forest?'
-- [input, sure]
-- - contains
-  - Is it a lynx?
-  - The last question should be 'Is it a lynx?'
-- [input, right]
+  - Welcome to the animal
+  - The program doesn't print the expected message
 - - matches
-  - (?si).*(again|repeat|one more game).*
-  - The program should ask to play again
-- [input, No]
-- [finish, The program should finish when the user refuse the new game]
-#
-# Clear workspace after the test
-#
+  - (?is).*1.*Play.*List.*Search.*stat.*Exit.*
+  - The program should print the menu
+- - input
+  - "0"
+- - finish
+  - The program should finish when user refuse the new game
 - - file delete
   - "animals.{0}"
   - "The test can't delete animals.{0} file."
-

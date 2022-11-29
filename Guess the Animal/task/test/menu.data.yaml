@@ -1,0 +1,65 @@
+---
+#
+# Test case #1
+#
+- - cat
+  - |
+    no
+    shark
+    it is a mammal
+    no
+    yes
+
+    yes
+    no
+    fox
+    it is living in the forest
+    yes
+    yes
+
+    yes
+    no
+    no
+    dog
+    it can climb trees
+    no
+    yes
+
+    yes
+    yes
+    no
+    wolf
+    it has a long bushy tail
+    no
+    yes
+
+    yes
+    yes
+    no
+    no
+    hare
+    it is a shy animal
+    yes
+    no
+
+  #
+  # 2. List of all animals
+  #
+  - "(?si).*cat.*dog.*hare.*shark.*wolf.*"
+
+  #
+  # 3. Search for an animal
+  #
+  - wolf
+  - "(?si).*is a mammal.*doesn't have a long bushy tail.*isn't a shy animal.*"
+
+  #
+  # Data for the Knowledge Tree statistics
+  #
+  - It is a mammal
+  - "11"
+  - "6"
+  - "5"
+  - "4"
+  - "1"
+  - "3"
