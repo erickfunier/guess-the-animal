@@ -1,98 +1,60 @@
 import java.util.ArrayDeque;
-import java.util.Arrays;
 import java.util.Deque;
 import java.util.Scanner;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
-import java.util.stream.Stream;
 
 class Main {
+    static int temp = -1;
 
-    private static String removeHtmlTag(String html) {
-        return html.replace("<" + "html" + ">", "").replace("</" + "html" + ">", "");
-    }
+    private static Deque<String[]> parseHtmlChild(String html) {
+        temp++;
+        Deque<String[]> htmlTags = new ArrayDeque<>();
 
-    private static Deque<String> parseHtmlChild(String html) {
-        Deque<String> htmlTags = new ArrayDeque<>();
-
-        while (html.length() > 1) {
-            int startIndexTag = 0;
-            int endIndexTag = 0;
-            for (int i = 0; i < html.length(); i++) {
-                if (html.toCharArray()[i] == '<') {
-                    startIndexTag = i;
-                    break;
-                }
+        // find the open tag
+        int startIndexOpen = 0;
+        int endIndexOpen = 0;
+        for (int i = 0; i < html.length(); i++) {
+            if (html.toCharArray()[i] == '<') {
+                startIndexOpen = i;
+            } else if (html.toCharArray()[i] == '>') {
+                endIndexOpen = i;
+                break;
             }
+        }
 
-            int skipCloseTag = 1;
-            int skipOpenTag = 1;
-
-            for (int i = startIndexTag + 1; i < html.length(); i++) {
-                if (html.toCharArray()[i] == '>') {
-                    if (skipCloseTag == 0 && skipOpenTag == 0) {
-                        endIndexTag = i;
-                        break;
-                    } else {
-                        if (skipCloseTag > 0)
-                            skipCloseTag--;
-                    }
-                } else if (html.toCharArray()[i] == '<' && html.toCharArray()[i+1] == '/') {
-                    skipOpenTag--;
-                } else if (html.toCharArray()[i] == '<') {
-                    skipOpenTag++;
-                    skipCloseTag++;
+        // find the close tag
+        int startIndexClose = endIndexOpen + 1;
+        int endIndexClose;
+        for (int i = endIndexOpen + 1; i < html.length(); i++) {
+            if (html.toCharArray()[i] == '<' && html.toCharArray()[i + 1] == '/') {
+                startIndexClose = i;
+            } else if (html.toCharArray()[i] == '<') {
+                Deque<String[]> childs = parseHtmlChild(html.substring(i));
+                for (String[] temp: childs)
+                    System.out.println(temp[1]);
+                for (String[] tempChild : childs) {
+                    i += Integer.parseInt(tempChild[2]);
                 }
+                i -= 1;
+            } else if (html.toCharArray()[i] == '>') {
+                endIndexClose = i;
+                htmlTags.push(new String[] {html.substring(startIndexOpen, endIndexClose + 1), html.substring(endIndexOpen + 1, startIndexClose), String.valueOf(html.substring(startIndexOpen, endIndexClose + 1).length())});
+                return htmlTags;
             }
-
-            htmlTags.push(html.substring(startIndexTag, endIndexTag + 1));
-            html = html.substring(endIndexTag + 1);
         }
 
         return htmlTags;
     }
 
-    private static boolean hasChild(String elem){
-        return elem.split("(?<=>)\\w+").length > 2;
-    }
-
-    private static void process(String tempHtml) {
-        final Pattern PARAM_NAME = Pattern.compile("(?<=>)\\w+", Pattern.DOTALL);
-
-        if (tempHtml.endsWith("<"))
-            tempHtml = tempHtml.substring(0, tempHtml.length()-1);
-
-        if (!hasChild(tempHtml)) {
-            Matcher m = PARAM_NAME.matcher(tempHtml);
-            if (m.find())
-                System.out.println(m.group(0));
-        } else {
-            Pattern betweenTags = Pattern.compile("(?<=>)([^$]+?)(?<=<)", Pattern.DOTALL);
-            Matcher m = betweenTags.matcher(tempHtml);
-            if (m.find()) {
-                m.results().forEach(temp -> process(String.valueOf(temp)));
-            }
-
-        }
-    }
-
     public static void main(String[] args) {
-        Deque<String> htmlTags;
-        Deque<String> htmlContents = new ArrayDeque<>();
+        Deque<String[]> htmlTags;
 
         Scanner scanner = new Scanner(System.in);
 
         String fullHtml = scanner.nextLine();
 
-        fullHtml = removeHtmlTag(fullHtml);
-
         htmlTags = parseHtmlChild(fullHtml);
 
-        for(String html : htmlTags) {
-            process(html);
-        }
-
-        System.out.println(htmlTags);
-
+        for (String[] temp: htmlTags)
+            System.out.println(temp[1]);
     }
 }
