@@ -1,13 +1,13 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<module external.linked.project.id=":Topics-Stack-The_LIFO_principle_in_action:test" external.linked.project.path="$MODULE_DIR$/../../../../../Topics/Stack/The LIFO principle in action" external.root.project.path="$MODULE_DIR$/../../../../.." external.system.id="GRADLE" external.system.module.group="guess-the-animal" external.system.module.type="sourceSet" external.system.module.version="unspecified" type="JAVA_MODULE" version="4">
+<module external.linked.project.id=":Topics-Recursion-Alternating_Fibonacci_numbers:test" external.linked.project.path="$MODULE_DIR$/../../../../../Topics/Recursion/Alternating Fibonacci numbers" external.root.project.path="$MODULE_DIR$/../../../../.." external.system.id="GRADLE" external.system.module.group="guess-the-animal" external.system.module.type="sourceSet" external.system.module.version="unspecified" type="JAVA_MODULE" version="4">
   <component name="NewModuleRootManager">
-    <output-test url="file://$MODULE_DIR$/../../../../../Topics/Stack/The LIFO principle in action/out/test/classes" />
+    <output-test url="file://$MODULE_DIR$/../../../../../Topics/Recursion/Alternating Fibonacci numbers/out/test/classes" />
     <exclude-output />
-    <content url="file://$MODULE_DIR$/../../../../../Topics/Stack/The LIFO principle in action/src/test" />
-    <content url="file://$MODULE_DIR$/../../../../../Topics/Stack/The LIFO principle in action/test" />
+    <content url="file://$MODULE_DIR$/../../../../../Topics/Recursion/Alternating Fibonacci numbers/src/test" />
+    <content url="file://$MODULE_DIR$/../../../../../Topics/Recursion/Alternating Fibonacci numbers/test" />
     <orderEntry type="inheritedJdk" />
     <orderEntry type="sourceFolder" forTests="false" />
-    <orderEntry type="module" module-name="guess-the-animal.Topics-Stack-The_LIFO_principle_in_action.main" />
+    <orderEntry type="module" module-name="guess-the-animal.Topics-Recursion-Alternating_Fibonacci_numbers.main" />
     <orderEntry type="module" module-name="IdeaProjects.guess-the-animal.util.main" />
     <orderEntry type="module" module-name="IdeaProjects.guess-the-animal.util.test~3" production-on-test="" />
     <orderEntry type="library" name="Gradle: com.fasterxml.jackson.dataformat:jackson-dataformat-xml:2.11.2" level="project" />
@@ -35,5 +35,4 @@
     <orderEntry type="library" name="Gradle: org.assertj:assertj-core:3.17.2" level="project" />
     <orderEntry type="library" scope="RUNTIME" name="Gradle: org.easytesting:fest-util:1.2.5" level="project" />
   </component>
-  <component name="TestModuleProperties" production-module="guess-the-animal.Topics-Stack-The_LIFO_principle_in_action.main" />
 </module>
