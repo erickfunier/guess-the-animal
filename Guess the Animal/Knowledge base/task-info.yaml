@@ -541,6 +541,12 @@ files:
         }
     }
   learner_created: true
+- name: animals.json
+  visible: true
+  learner_created: true
 feedback_link: https://hyperskill.org/learn/step/11083#comment
-status: Unchecked
-record: -1
+status: Solved
+feedback:
+  message: Congratulations!
+  time: "Sat, 03 Dec 2022 23:50:22 UTC"
+record: 5

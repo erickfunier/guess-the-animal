@@ -9,7 +9,7 @@
     <orderEntry type="sourceFolder" forTests="false" />
     <orderEntry type="module" module-name="guess-the-animal.Topics-Recursion-Alternating_Fibonacci_numbers.main" />
     <orderEntry type="module" module-name="IdeaProjects.guess-the-animal.util.main" />
-    <orderEntry type="module" module-name="IdeaProjects.guess-the-animal.util.test~3" production-on-test="" />
+    <orderEntry type="module" module-name="IdeaProjects.guess-the-animal.util.test~2" production-on-test="" />
     <orderEntry type="library" name="Gradle: com.fasterxml.jackson.dataformat:jackson-dataformat-xml:2.11.2" level="project" />
     <orderEntry type="library" name="Gradle: com.fasterxml.jackson.dataformat:jackson-dataformat-yaml:2.11.2" level="project" />
     <orderEntry type="library" name="Gradle: com.fasterxml.jackson.core:jackson-databind:2.11.2" level="project" />
@@ -35,4 +35,5 @@
     <orderEntry type="library" name="Gradle: org.assertj:assertj-core:3.17.2" level="project" />
     <orderEntry type="library" scope="RUNTIME" name="Gradle: org.easytesting:fest-util:1.2.5" level="project" />
   </component>
+  <component name="TestModuleProperties" production-module="guess-the-animal.Topics-Recursion-Alternating_Fibonacci_numbers.main" />
 </module>

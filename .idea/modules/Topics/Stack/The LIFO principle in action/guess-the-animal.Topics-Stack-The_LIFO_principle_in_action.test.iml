@@ -9,7 +9,7 @@
     <orderEntry type="sourceFolder" forTests="false" />
     <orderEntry type="module" module-name="guess-the-animal.Topics-Stack-The_LIFO_principle_in_action.main" />
     <orderEntry type="module" module-name="IdeaProjects.guess-the-animal.util.main" />
-    <orderEntry type="module" module-name="IdeaProjects.guess-the-animal.util.test~3" production-on-test="" />
+    <orderEntry type="module" module-name="IdeaProjects.guess-the-animal.util.test~2" production-on-test="" />
     <orderEntry type="library" name="Gradle: com.fasterxml.jackson.dataformat:jackson-dataformat-xml:2.11.2" level="project" />
     <orderEntry type="library" name="Gradle: com.fasterxml.jackson.dataformat:jackson-dataformat-yaml:2.11.2" level="project" />
     <orderEntry type="library" name="Gradle: com.fasterxml.jackson.core:jackson-databind:2.11.2" level="project" />

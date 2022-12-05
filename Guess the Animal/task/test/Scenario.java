@@ -52,10 +52,10 @@ public class Scenario {
                         output = action.length == 1
                                 ? main.start()
                                 : main.start(format(action[1], values).split(" "));
-                        output = output.trim();
+                        output = output.trim().toLowerCase();
                         continue;
                     case "input":
-                        output = main.execute(format(action[1], values)).trim();
+                        output = main.execute(format(action[1], values)).trim().toLowerCase();
                         continue;
                     case "finish":
                         if (main.isFinished()) {

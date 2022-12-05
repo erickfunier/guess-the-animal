@@ -78,12 +78,12 @@ public class BinaryTree {
     }
 
     private static String removeFactPrefix(String fact) {
-        return fact.toLowerCase().replace("it ", "");
+        return fact.toLowerCase().replace("it ", "").replace("ĝi ", "");
     }
 
     public static String getFactWithPrefix(String fact, String relation) {
-        String[] pos = {"can", "has", "is"};
-        String[] neg = {"can't", "doesn't have", "isn't"};
+        String[] pos = {"can", "has", "is", "povas", "havas", "estas"};
+        String[] neg = {"can't", "doesn't have", "isn't", "ne povas", "ne havas", "ne estas"};
 
         if (relation.equals("pos")) {
             for (String po : pos) {
@@ -106,6 +106,9 @@ public class BinaryTree {
             if (node.getData().toLowerCase().startsWith("it")) {
                 System.out.println("- The " + removePrefix(node.getYes().getData()) + " " + getFactWithPrefix(node.getData(), "pos") + ".");
                 System.out.println("- The " + removePrefix(node.getNo().getData()) + " " + getFactWithPrefix(node.getData(), "neg") + ".");
+            } else if (node.getData().toLowerCase().startsWith("ĝi")) {
+                System.out.println("- La " + removePrefix(node.getYes().getData()) + " " + getFactWithPrefix(node.getData(), "pos") + ".");
+                System.out.println("- La " + removePrefix(node.getNo().getData()) + " " + getFactWithPrefix(node.getData(), "neg") + ".");
             }
         }
     }
